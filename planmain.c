@@ -150,13 +150,6 @@ path_create(PlannerInfo *root, List *tlist,
 	joinlist = deconstruct_jointree(root);
 	TODO: think about a way to distribute the qual into each join.
 	*/
-
-	/*
-	 *Don't understand what this function is doing
-	 *it should be related to join. 
-	 *deleting this will also affect scan, qual is not present if deleted
-	 *By HQ
-	 */
 	qp_distribute_quals(mockpath, root);
 
 	/*

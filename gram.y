@@ -7101,6 +7101,18 @@ QualExprs:
 				};
 
 QualExpr:
+    '(' QualExpr AND QualExpr ')'
+        {
+          A_Expr *n = makeA_Expr(AEXPR_AND, NIL, $2, $4, @3);
+          $$ = (Node *)n;
+        }
+    |
+    '(' QualExpr OR QualExpr ')'
+        {
+          A_Expr *n = makeA_Expr(AEXPR_OR, NIL, $2, $4, @3);
+          $$= (Node *)n;
+        }
+    |
     a_expr
         {
           $$ = $1;

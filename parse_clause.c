@@ -158,7 +158,7 @@ transformQualExpr(ParseState *pstate, Node *clause, MockPath *mockpath)
 }
 
 /*
- *The clause is a complex tree structure, need to
+ *The clause is a complex tree structure, need to 
  *recursively process qualification expressions
  */
 Node* transformQualExprRec(ParseState *pstate, Node *clause)
@@ -173,10 +173,10 @@ Node* transformQualExprRec(ParseState *pstate, Node *clause)
   Assert(IsA(clause, A_Expr));
 
   kind = ((A_Expr *)clause)->kind;
-
+  
   if(kind == AEXPR_AND || kind == AEXPR_OR){
-    rexpr = ((A_Expr *)clause)->rexpr;
     lexpr = ((A_Expr *)clause)->lexpr;
+    rexpr = ((A_Expr *)clause)->rexpr;
 
     lqual = transformQualExprRec(pstate, lexpr);
     rqual = transformQualExprRec(pstate, rexpr);
@@ -190,7 +190,7 @@ Node* transformQualExprRec(ParseState *pstate, Node *clause)
        quals = (Node *)makeBoolExpr(OR_EXPR, list_make2(lqual,rqual), NULL);
     }
   }else{
-    quals = transformExpr(pstate, (void *)clause);
+    quals = transformExpr(pstate, (void *)clause);  
   }
   quals = coerce_to_boolean(pstate, quals, "WHERE");
 
