@@ -70,6 +70,7 @@ void qp_distribute_quals(MockPath* mockpath, PlannerInfo * root){
 	/* before we distribute quals, we need preprocess it */
 	Node * quals = mockpath->quals;
 	quals = preprocess_expression(root, quals, 0);
+
 	foreach(l,(List *)quals){
 		Node *qual = (Node *)lfirst(l);
 		Relids relids = pull_varnos(qual);

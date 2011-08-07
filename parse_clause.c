@@ -141,39 +141,60 @@ transformRelationName(ParseState *pstate, Node *n, MockPath *mockpath)
  * when carrying out a particular operation.
  */
 void
-transformQualExpr(ParseState *pstate, List *clause, MockPath *mockpath)
+transformQualExpr(ParseState *pstate, Node *clause, MockPath *mockpath)
 {
-	Node	   *qual = NULL;
-	ListCell *clauseItem;
 	Node     *quals = NULL;
 
   /* if there is no qulification expression, we need do nothing */
 	if (clause == NULL)
 		return;
 
-  /* the clause is a list of qualification expression,
-   * therefore we need process each qualification expression one by one 
-   */
-  foreach(clauseItem, clause)
-  {
-  	qual = transformExpr(pstate, lfirst(clauseItem));
-  	
-  	if(quals == NULL){
-  		quals = qual;
-  	}else{
-  		/* all qualification expressions in query plan statement are combined by AND
-  		 * So if there are more than one clause, we build an AND qual. */
-  		quals = coerce_to_boolean(pstate,quals,"AND");
-  		qual = coerce_to_boolean(pstate,qual,"AND");
-  		
-  		quals = (Node *)makeBoolExpr(AND_EXPR, list_make2(quals, qual), NULL);
-  	}
-  }
-  
+  quals = transformQualExprRec(pstate, clause);
+
   quals = coerce_to_boolean(pstate, quals, "QueryPlan"); 
 	
 	/* add this quals into mockpath */
 	mockpath->quals = quals;
+}
+
+/*
+ *The clause is a complex tree structure, need to
+ *recursively process qualification expressions
+ */
+Node* transformQualExprRec(ParseState *pstate, Node *clause)
+{
+  Node *lexpr ;
+  Node *rexpr ;
+  A_Expr_Kind kind;
+  Node *lqual = NULL;
+  Node *rqual = NULL;
+  Node *quals = NULL;
+
+  Assert(IsA(clause, A_Expr));
+
+  kind = ((A_Expr *)clause)->kind;
+
+  if(kind == AEXPR_AND || kind == AEXPR_OR){
+    rexpr = ((A_Expr *)clause)->rexpr;
+    lexpr = ((A_Expr *)clause)->lexpr;
+
+    lqual = transformQualExprRec(pstate, lexpr);
+    rqual = transformQualExprRec(pstate, rexpr);
+
+    lqual = coerce_to_boolean(pstate, lqual, "WHERE");
+    rqual = coerce_to_boolean(pstate, rqual, "WHERE");
+
+    if(kind == AEXPR_AND){
+       quals = (Node *)makeBoolExpr(AND_EXPR, list_make2(lqual, rqual), NULL);
+    }else{
+       quals = (Node *)makeBoolExpr(OR_EXPR, list_make2(lqual,rqual), NULL);
+    }
+  }else{
+    quals = transformExpr(pstate, (void *)clause);
+  }
+  quals = coerce_to_boolean(pstate, quals, "WHERE");
+
+  return quals;
 }
 
 Node*

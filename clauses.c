@@ -2369,7 +2369,8 @@ eval_const_expressions_mutator(Node *node,
 					if (list_length(newargs) == 1)
 						return (Node *) linitial(newargs);
 					/* Else we still need an OR node */
-					return (Node *) make_orclause(newargs);
+					Node *tmp_test = (Node *) make_orclause(newargs);
+					return tmp_test;
 				}
 			case AND_EXPR:
 				{
@@ -2390,7 +2391,8 @@ eval_const_expressions_mutator(Node *node,
 					if (list_length(newargs) == 1)
 						return (Node *) linitial(newargs);
 					/* Else we still need an AND node */
-					return (Node *) make_andclause(newargs);
+					Node *tmp_test = (Node *) make_andclause(newargs);
+					return tmp_test;
 				}
 			case NOT_EXPR:
 				{

@@ -33,7 +33,7 @@ typedef struct SeqScanOperator
 {
 	NodeTag type;
 	Node *table;
-	List*  exprs;
+	Node*  exprs;
 } SeqScanOperator;
 
 typedef struct IndexScanOperator
@@ -41,7 +41,7 @@ typedef struct IndexScanOperator
 	NodeTag type;
 	Node *table;
 	Node* col;
-	List* exprs;
+	Node* exprs;
 }IndexScanOperator;
 
 typedef struct BMHeapScanOperator
@@ -56,7 +56,7 @@ typedef struct BMIndexScanOperator
 	NodeTag type;
 	Node *table;
 	Node* col;
-	List* exprs;
+	Node* exprs;
 }BMIndexScanOperator;
 
 typedef struct BMAndOperator

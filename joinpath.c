@@ -62,6 +62,23 @@ qp_add_paths_to_joinrel(PlannerInfo *root,
 	int        flag = 0;
 	
 	/*
+	 * Consider mergejoin path if it is a merge join
+	 */
+	if(!enable_mergejoin){
+		elog(ERROR, "Mergejoin is disabled by the current system setting");
+	}else if(mockpath->pathtype == T_MergeJoinOperator){
+		mergeclause_list = select_mergejoin_clauses(root,
+					joinrel,
+					outerrel,
+					innerrel,
+					restrictlist,
+					jointype);
+	}
+	/*
+	 * Not sure whether I should add the several cases in function add_paths_to_joinrel;  HQ
+	 */
+
+	/*
 	 * Consider nestloop path if it is a nestloop join
 	 */
 	if (mockpath->pathtype == T_NestLoopOperator) {

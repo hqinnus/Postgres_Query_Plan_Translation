@@ -308,7 +308,7 @@ static TypeName *TableFuncTypeName(List *columns);
 				opt_enum_val_list enum_val_list table_func_column_list
 				create_generic_options alter_generic_options
 				relation_expr_list dostmt_opt_list
-				QualExprs
+				QualExprs QualExpr
 
 %type <range>	OptTempTableName
 %type <into>	into_clause create_as_target
@@ -7074,7 +7074,7 @@ HashJoinOperator:
 MergeJoinOperator:
 		'(' MERGEJOIN ',' TupleCollection ',' ColName ',' TupleCollection ',' ColName ')'
 				{
-					MergeJoinOpeartor *n = makeNode(MergeJoinOpeartor);
+					MergeJoinOperator *n = makeNode(MergeJoinOperator);
 			
 					n->leftopr = $4;
 					n->leftcol = $6;
@@ -7092,13 +7092,19 @@ MaterializationOperator:
 				};
 				
 QualExprs:
-		',' expr_list
+		',' QualExpr
 				{
 					$$=$2;
 				}
 		|   {
 					$$= NULL;
 				};
+
+QualExpr:
+    a_expr
+        {
+          $$ = $1;
+        };
 							
 TupleCollection:
 		Plan
@@ -11988,7 +11994,7 @@ getTable(Node *operator){
 			break;
 		
 		case T_MergeJoinOperator:
-			return ((MergeJoinOpeartor *)operator)->table;
+			return ((MergeJoinOperator *)operator)->table;
 			break;
 
 		default:
