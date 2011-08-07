@@ -259,43 +259,6 @@ transform_qpoperator(ParseState *pstate, Node *n, MockPath *mockpath)
 				mockpath->rmp = rmp;
 			}
 			break;
-		
-		case T_MergeJoinOperator:
-			{
-				MockPath *lmp = make_mockpath();
-				MockPath *rmp = make_mockpath();
-				
-				Node* lopr = NULL;
-				Node* ropr = NULL;
-				Node* lcol = NULL;
-				Node* rcol = NULL;
-				Node* qual = NULL;
-				
-				mockpath->pathtype = T_MergeJoinOperator;
-				
-				/* process its two join operands first */
-				lopr = ((MergeJoinOperator*)n)->leftopr;
-				ropr = ((MergeJoinOperator*)n)->rightopr;
-			  
-			  transform_qpoperator(pstate, lopr, lmp);
-			  transform_qpoperator(pstate, ropr, rmp);
-			  /* interpret join column owned by lopr */
-			  lcol = ((MergeJoinOperator*)n)->leftcol;
-			  lcol = transformJoinColumn(pstate, lcol);
-			  
-				/* interpret join column owned by ropr */
-				rcol = ((MergeJoinOperator*)n)->rightcol;
-			  rcol = transformJoinColumn(pstate, rcol);
-				
-				/* TODO: */
-				qual = (Node *) make_op(pstate,list_make1(makeString((char *)"=")),lcol,rcol,NULL);
-				mockpath->quals = coerce_to_boolean(pstate, qual, "QueryPlan");
-				
-				mockpath->lmp = lmp;
-				mockpath->rmp = rmp;
-			}
-			break;
-	
 		default:
 			elog(ERROR,"undefined node tag found @transform_qpoperator");
 			break;

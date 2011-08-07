@@ -64,6 +64,7 @@ qp_add_paths_to_joinrel(PlannerInfo *root,
 	/*
 	 * Consider mergejoin path if it is a merge join
 	 */
+    /*
 	if(!enable_mergejoin){
 		elog(ERROR, "Mergejoin is disabled by the current system setting");
 	}else if(mockpath->pathtype == T_MergeJoinOperator){
@@ -73,7 +74,7 @@ qp_add_paths_to_joinrel(PlannerInfo *root,
 					innerrel,
 					restrictlist,
 					jointype);
-	}
+	}*/
 	/*
 	 * Not sure whether I should add the several cases in function add_paths_to_joinrel;  HQ
 	 */

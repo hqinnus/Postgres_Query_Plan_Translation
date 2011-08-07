@@ -51,7 +51,7 @@ typedef enum NodeTag
 	T_MaterializationOperator,
 	T_NestLoopOperator,
 	T_HashJoinOperator,
-	T_MergeJoinOperator,
+	//T_MergeJoinOperator,
 	T_MockPath,
 
 	/*

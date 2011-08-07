@@ -88,13 +88,13 @@ typedef struct HashJoinOperator{
 	Node* rightcol;
 }HashJoinOperator;
 
-typedef struct MergeJoinOperator{
+/*typedef struct MergeJoinOperator{
 	NodeTag type;
 	Node* leftopr;
 	Node* leftcol;
 	Node* rightopr;
 	Node* rightcol;
-}MergeJoinOperator;
+}MergeJoinOperator;*/
 
 typedef struct MaterializationOperator{
 	NodeTag type;
