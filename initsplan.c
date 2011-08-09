@@ -90,9 +90,10 @@ void qp_distribute_quals(MockPath* mockpath, PlannerInfo * root){
 		{
 			if (true)
 			{
-				if (!process_equivalence(root, restrictinfo, false)){
-				    elog(ERROR,"Error in distribute quals.@qp_distribte_quals");
+				if (process_equivalence(root, restrictinfo, false)){
+				    continue;
 				}
+				elog(ERROR,"Error in distribute quals.@qp_distribte_quals");
 			}
 		}
 		
