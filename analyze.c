@@ -90,7 +90,7 @@ qp_parse_analyze(Node *parseTree, const char *sourceText,
 
 	Assert(sourceText != NULL); 
 	//this function only deals with the queryplanstmt case
-	Assert(IsA((Node *)parsetree, QueryPlanStmt));
+	Assert(IsA((Node *)parseTree, QueryPlanStmt));
 
 	pstate->p_sourcetext = sourceText;
 

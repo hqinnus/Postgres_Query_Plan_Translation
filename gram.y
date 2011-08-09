@@ -212,7 +212,7 @@ static TypeName *TableFuncTypeName(List *columns);
 		DropOwnedStmt ReassignOwnedStmt
 		AlterTSConfigurationStmt AlterTSDictionaryStmt
 		Plan SeqScanOperator IndexScanOperator BMIndexScanOperator BMHeapScanOperator
-		BMAndOperator BMOrOperator NestLoopOperator HashJoinOperator MergeJoinOperator MaterializationOperator
+		BMAndOperator BMOrOperator NestLoopOperator HashJoinOperator MaterializationOperator
 		QueryPlanStmt
 
 %type <node> bitmap TupleCollection ColName
@@ -308,7 +308,8 @@ static TypeName *TableFuncTypeName(List *columns);
 				opt_enum_val_list enum_val_list table_func_column_list
 				create_generic_options alter_generic_options
 				relation_expr_list dostmt_opt_list
-				QualExprs QualExpr
+                QualExprs QualExpr
+
 
 %type <range>	OptTempTableName
 %type <into>	into_clause create_as_target
@@ -552,7 +553,7 @@ static TypeName *TableFuncTypeName(List *columns);
 
 	ZONE
 	
-	QUERYPLAN SEQSCAN INDEXSCAN BMHEAPSCAN BMINDEXSCAN  MATERIALIZATION NESTLOOP HASHJOIN MERGEJOIN
+	QUERYPLAN SEQSCAN INDEXSCAN BMHEAPSCAN BMINDEXSCAN  MATERIALIZATION NESTLOOP HASHJOIN
 
 /*
  * The grammar thinks these are keywords, but they are not in the kwlist.h
@@ -6951,10 +6952,6 @@ Plan:
 				{
 					$$ = $1;
 				}
-		| MergeJoinOperator
-				{
-					$$ = $1;
-				}
 		;
 		
 SeqScanOperator:
@@ -7071,17 +7068,6 @@ HashJoinOperator:
 					$$ = (Node *)n;
 				};
 
-MergeJoinOperator:
-		'(' MERGEJOIN ',' TupleCollection ',' ColName ',' TupleCollection ',' ColName ')'
-				{
-					MergeJoinOperator *n = makeNode(MergeJoinOperator);
-			
-					n->leftopr = $4;
-					n->leftcol = $6;
-					n->rightopr = $8;
-					n->rightcol = $10;
-					$$ = (Node *)n;
-				};
 
 MaterializationOperator:
 		'(' MATERIALIZATION ',' TupleCollection ')'
@@ -7092,31 +7078,20 @@ MaterializationOperator:
 				};
 				
 QualExprs:
-		',' QualExpr
-				{
-					$$=$2;
-				}
-		|   {
-					$$= NULL;
-				};
-
+         ',' QualExpr
+         		{
+         			$$ = $2;
+        		}
+         |	{
+         			$$ = NULL;
+         };
+         
 QualExpr:
-    '(' QualExpr AND QualExpr ')'
-        {
-          A_Expr *n = makeA_Expr(AEXPR_AND, NIL, $2, $4, @3);
-          $$ = (Node *)n;
-        }
-    |
-    '(' QualExpr OR QualExpr ')'
-        {
-          A_Expr *n = makeA_Expr(AEXPR_OR, NIL, $2, $4, @3);
-          $$= (Node *)n;
-        }
-    |
-    a_expr
-        {
-          $$ = $1;
-        };
+	a_expr
+	{
+		$$ = $1;
+	};
+
 							
 TupleCollection:
 		Plan
@@ -11176,7 +11151,6 @@ unreserved_keyword:
 			| MATCH
 			| MATERIALIZATION
 			| MAXVALUE
-			| MERGEJOIN
 			| MINUTE_P
 			| MINVALUE
 			| MODE
@@ -12005,10 +11979,6 @@ getTable(Node *operator){
 			return ((HashJoinOperator *)operator)->table;
 			break;
 		
-		case T_MergeJoinOperator:
-			return ((MergeJoinOperator *)operator)->table;
-			break;
-
 		default:
 			elog(ERROR, "Unrecognized node found");
 			return NULL;
